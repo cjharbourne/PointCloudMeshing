@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.neighbors import BallTree
 from stl import mesh
+import trimesh
 
 import lifted_triangulation as triangulate
 
@@ -50,8 +51,26 @@ for idx, face in enumerate(triangles):
     wolf.vectors[idx] = face
 
 wolf.save('ball_wolf_braycurtis.stl')
-print("Completed Final STL Generation")
+print("Completed Initial STL Generation")
 
+wolf = trimesh.load("ball_wolf_braycurtis.stl")
+print("Beginning mesh repair.")
+
+print("Euler Number of mesh before repair = {}".format(wolf.euler_number))
+
+wolf.process()
+wolf.remove_degenerate_faces()
+wolf.remove_duplicate_faces()
+wolf.merge_vertices()
+wolf.remove_infinite_values()
+wolf.remove_unreferenced_vertices()
+wolf.fix_normals()
+wolf.fill_holes()
+
+print("Euler Number of mesh after repair = {}".format(wolf.euler_number))
+
+
+wolf.export(file_obj="processed_wolf2.stl")
 
 
 
